@@ -1,7 +1,7 @@
 var VINO_VERSION = "0.0.1";
 var VINO_DEFAULT_OPTS = {
 	baseUrl: 'https://api.vineapp.com/',
-	debug: 1,
+	debug: 0,
 	deviceToken: 'Vino',
 	userAgent: 'com.vine.iphone/1.01 (unknown, iPhone OS 6.0, iPad, Scale/2.000000) (Vino.js/'+VINO_VERSION+')'
 };
@@ -86,13 +86,51 @@ Vino.prototype.login = function(callback) {
 	);
 };
 
-Vino.prototype.tagSearch = function(tag, callback) {
+Vino.prototype.tagSearch = function(tag, qs, callback) {
+	if (typeof qs === 'function' && !callback) {
+		callback = qs;
+		qs = {};
+	}
 	if (!('sessionId' in this))
 		throw new Error('must be logged in');
 	var bu = this.opts.baseUrl, that = this;
 	request(
 		{
+			qs: qs,
 			url: bu+'timelines/tags/'+encodeURIComponent(tag),
+			method: 'get',
+			headers: {
+				'vine-session-id': this.sessionId,
+				'User-Agent': this.opts.userAgent
+			}
+		},
+		function (err, resp, body) {
+			that.debug('tagSearch response', err, resp, body);
+			if (err) {
+				callback(err, resp);
+				return;
+			}
+			body = JSON.parse(body);
+			if (body.code) {
+				callback('tagSearch failure', body);
+			}
+			callback(null, body.data);
+		}
+	);
+};
+
+Vino.prototype.findTags = function(tag, qs, callback) {
+	if (typeof qs === 'function' && !callback) {
+		callback = qs;
+		qs = {};
+	}
+	if (!('sessionId' in this))
+		throw new Error('must be logged in');
+	var bu = this.opts.baseUrl, that = this;
+	request(
+		{
+			qs: qs,
+			url: bu+'tags/search/'+encodeURIComponent(tag),
 			method: 'get',
 			headers: {
 				'vine-session-id': this.sessionId,
