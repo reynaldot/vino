@@ -50,6 +50,39 @@ Vino.prototype.homeFeed = function(callback) {
 	);
 };
 
+Vino.prototype.signup = function (callback) {
+	var bu = this.opts.baseUrl, that = this;
+	request({
+		url: bu + 'users',
+		method: 'post',
+		form: { 
+			username: this.opts.username,
+			password: this.opts.password,
+			email:    this.opts.email,
+			authenticate: 1
+		},
+		headers: {
+			'User-Agent': this.opts.userAgent
+		}
+	},
+	function (err, resp, body) {
+		that.debug('signup response', err, resp, body);
+		if (err) {
+			callback(err, resp);
+			return;
+		}
+		body = JSON.parse(body);
+		if (!body.success) {
+			callback('signup failure', body);
+			return;
+		}
+		that.sessionId = body.data.key;
+		that.userId = body.data.userId;
+		that.debug('session id', that.sessionId);
+		callback(null, that.sessionId, that.userId, that);
+	});
+};
+
 Vino.prototype.login = function(callback) {
 	if (!('username' in this.opts) ||
 			!('password' in this.opts))
