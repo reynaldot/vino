@@ -41,7 +41,7 @@ Vino.prototype.homeFeed = function(callback) {
 				callback(err, resp);
 				return;
 			}
-			body = JSON.parse(body);
+			body = jsonSafeParse(body);
 			if (body.code) {
 				callback('homeFeed failure', body);
 			}
@@ -71,7 +71,7 @@ Vino.prototype.signup = function (callback) {
 			callback(err, resp);
 			return;
 		}
-		body = JSON.parse(body);
+		body = jsonSafeParse(body);
 		if (!body.success) {
 			callback('signup failure', body);
 			return;
@@ -107,9 +107,9 @@ Vino.prototype.login = function(callback) {
 				callback(err, resp);
 				return;
 			}
-			body = JSON.parse(body);
+      body = jsonSafeParse(body);  
 			if (!body.success) {
-				callback('login failure', body);
+				return callback('login failure', body);
 			}
 			that.sessionId = body.data.key;
 			that.userId = body.data.userId;
@@ -143,9 +143,9 @@ Vino.prototype.tagSearch = function(tag, qs, callback) {
 				callback(err, resp);
 				return;
 			}
-			body = JSON.parse(body);
+      body = jsonSafeParse(body);  
 			if (body.code) {
-				callback('tagSearch failure', body);
+				return callback('tagSearch failure', body);
 			}
 			callback(null, body.data);
 		}
@@ -176,14 +176,24 @@ Vino.prototype.findTags = function(tag, qs, callback) {
 				callback(err, resp);
 				return;
 			}
-			body = JSON.parse(body);
+  		body = jsonSafeParse(body);
 			if (body.code) {
-				callback('tagSearch failure', body);
+				return callback('tagSearch failure', body);
 			}
 			callback(null, body.data);
 		}
 	);
 };
+
+function jsonSafeParse(json) {
+  var obj = {};
+  try {
+    obj = JSON.parse(json);
+  } catch(err) {
+    console.error('jsonSafeParse', err);
+  }
+  return obj;
+}
 
 function extend(target) {
 	for (var i = 1; i < arguments.length; i++) {
