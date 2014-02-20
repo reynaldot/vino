@@ -41,11 +41,11 @@ Vino.prototype.homeFeed = function(callback) {
 				callback(err, resp);
 				return;
 			}
-			body = jsonSafeParse(body);
-			if (body.code) {
+			var result = jsonSafeParse(body);
+			if (result.code) {
 				callback('homeFeed failure', body);
 			}
-			callback(null, body.data);
+			callback(null, result.data);
 		}
 	);
 };
@@ -71,13 +71,13 @@ Vino.prototype.signup = function (callback) {
 			callback(err, resp);
 			return;
 		}
-		body = jsonSafeParse(body);
-		if (!body.success) {
+		var result = jsonSafeParse(body);
+		if (!result.success) {
 			callback('signup failure', body);
 			return;
 		}
-		that.sessionId = body.data.key;
-		that.userId = body.data.userId;
+		that.sessionId = result.data.key;
+		that.userId = result.data.userId;
 		that.debug('session id', that.sessionId);
 		callback(null, that.sessionId, that.userId, that);
 	});
@@ -107,12 +107,12 @@ Vino.prototype.login = function(callback) {
 				callback(err, resp);
 				return;
 			}
-      body = jsonSafeParse(body);  
-			if (!body.success) {
+      var result = jsonSafeParse(body);  
+			if (!result.success) {
 				return callback('login failure', body);
 			}
-			that.sessionId = body.data.key;
-			that.userId = body.data.userId;
+			that.sessionId = result.data.key;
+			that.userId = result.data.userId;
 			that.debug('session id', that.sessionId);
 			callback(null, that.sessionId, that.userId, that);
 		}
@@ -143,11 +143,11 @@ Vino.prototype.tagSearch = function(tag, qs, callback) {
 				callback(err, resp);
 				return;
 			}
-      body = jsonSafeParse(body);  
-			if (body.code) {
+      var result = jsonSafeParse(body);  
+			if (result.code) {
 				return callback('tagSearch failure', body);
 			}
-			callback(null, body.data);
+			callback(null, result.data);
 		}
 	);
 };
@@ -176,11 +176,11 @@ Vino.prototype.findTags = function(tag, qs, callback) {
 				callback(err, resp);
 				return;
 			}
-  		body = jsonSafeParse(body);
-			if (body.code) {
+  		var result = jsonSafeParse(body);
+			if (result.code) {
 				return callback('tagSearch failure', body);
 			}
-			callback(null, body.data);
+			callback(null, result.data);
 		}
 	);
 };
